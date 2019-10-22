@@ -1,0 +1,439 @@
+	//*****************************************************************************
+	//  Student Name: Archan Patel
+	//  Student Number:  20834719 
+	//  SYDE 121 Lab: 3 Assignment: 1
+	//  Filename: lab03_01
+	//  I hereby declare that this code, submitted for credit for the course
+	//  SYDE121, is a product of my own efforts.  This coded solution has
+	//  not been plagiarized from other sources and has not been knowingly
+	//  plagiarized by others.
+	//  Project:  soccer game simulator 
+	//  Purpose:  simulates a soccer game based on random generated numbers
+	//  Date:  Saturday, October 5, 2019
+	//*****************************************************************************
+
+//libraries
+#include <iostream>
+#include <cmath>
+#include <unistd.h>
+#include <iomanip>
+#include <cstdlib>
+#include <time.h>
+using namespace std;
+
+//global variables
+int num_of_events; //stores number of events in the game
+int type_of_evnt; //stores the type of each event
+int team_A_goals = 0; //stores the total goals for Team A
+int team_B_goals = 0; //stores the total goals for Team B
+int shots_on_goal_A = 0; //stores the total shots on goal for Team A
+int shots_on_goal_B = 0; //stores the total shots on goal for Team B
+int shots_off_goal_A = 0; //stores the total shots off goal for Team A
+int shots_off_goal_B = 0; //stores the total shots off goal for Team B
+int shots_blocked_A = 0; //Stores the number of shots blocked by Team A
+int shots_blocked_B = 0; //Stores the number of shots blocked by Team B
+int fouls_A = 0; //Stores the number of fouls commited by Team A
+int fouls_B = 0; //Store the number of fouls commited by Team B
+int yellows_A = 0; //Stores the number of yellow cards for Team A
+int yellows_B = 0; //Stores the number of yellow cards for Team B
+int reds_A = 0; //Stores the number of red cards for Team A
+int reds_B = 0; //Storees the number of red cards for Team B
+
+//function declaration
+void simulate_game();
+	//purpose: the main function that handles the logic of when to run the events
+	//inputs: no inputs, only needs to be called to run game
+	//output: it is a command, therefore it's outputs go staight to the console
+int type_of_event();
+	//purpose: to generate a number from 1-6 to determine what type of event is to be executed
+	//input: no input
+	//output: random number from 1-6
+int number_of_events();
+	//purpose: to determine the number of events that happen during the game
+	//input: no input
+	//output: a number from 1-30 
+int do_each_event(int event_type);
+	//purpose: execute the specific type of event
+	//input: a number genereted from 1-6 
+	//output: the specific commentary based on the type of event
+int is_target_goal();
+	//purpose: to generate a random number to decide what happened with the ball being shot
+	//input: no input
+	//output: and number from 0-2 and the appropriate commentary based on the situation
+int is_penalty_goal();
+	//purpose: to determine if the penalty was scored
+	//input: no input
+	//output: a number from 0-2 and the appropriate commentary based on the situation
+int is_card();
+	//purpose: to determine whether the team that fouled should get a card
+	//input: no input
+	//output: a number from 0-2
+
+//main
+int main () 
+{
+	//run the simulation
+	simulate_game();
+	return 0;
+}//end of main
+
+//function definitions
+void simulate_game()
+{
+	//variable declaration
+	int first_half_events; //stores the number of events in the first half
+	int second_half_events; //stores the number of events in the first half
+	
+	num_of_events = number_of_events(); //determine number of events
+	first_half_events = num_of_events/2; 
+	second_half_events = num_of_events - first_half_events;
+	
+	//execute all events in the first half
+	for (int i = 0; i <= first_half_events; i++)
+	{
+		type_of_evnt = type_of_event(); //generate type of event
+		do_each_event(type_of_evnt);
+		sleep(2); //delay after each event to create realism
+	}
+	
+	//output all stats at the halftime mark
+	srand(time(0)); //used to ensure the rand() function remains random
+	cout << "\n*********************SCORE BOARD**************************";
+	cout << "\nHALF TIME!";
+	cout << "\n\nTeam A goals: " << team_A_goals;
+	cout << "\nTeam B goals: " << team_B_goals << "\n\n";
+	cout << "Team A shots on goal: " << shots_on_goal_A << "\n";
+	cout << "Team B shots on goal: " << shots_on_goal_B << "\n\n";
+	cout << "Team A shots off goal: " << shots_off_goal_A << "\n";
+	cout << "Team B shots off goal: " << shots_off_goal_B << "\n\n";
+	cout << "Team A blocked shots: " << shots_blocked_A << "\n";
+	cout << "Team B blocked shots: " << shots_blocked_B << "\n\n";
+	cout << "Team A yellow cards: " << yellows_A << "\n";
+	cout << "Team B yellow cards: " << yellows_B << "\n\n";
+	cout << "Team A red cards: " << reds_A << "\n";
+	cout << "Team B red cards: " << reds_B << "\n";
+	cout << "*********************SCORE BOARD**************************\n\n";
+	sleep(2); // delay
+	
+	//execute the second half events
+	for (int i = 0; i <= second_half_events; i++)
+	{
+		type_of_evnt = type_of_event(); //generate type of event
+		do_each_event(type_of_evnt);
+		sleep(2); //delay
+	}
+	
+	//display the stats along with the specific outcome of the game
+	cout << "\n*********************SCORE BOARD**************************";
+	if (team_A_goals > team_B_goals)
+	{
+		cout << "\nTEAM A HAS WON!";
+		cout << "\n\nTeam A goals: " << team_A_goals;
+		cout << "\nTeam B goals: " << team_B_goals << "\n\n";
+	}
+	else if (team_B_goals > team_A_goals)
+	{
+		cout << "\nTEAM B HAS WON!";
+		cout << "\n\nTeam A goals: " << team_A_goals;
+		cout << "\nTeam B goals: " << team_B_goals << "\n\n";
+	}
+	else 
+	{
+		cout << "\nIT WAS A TIE!";
+		cout << "\n\nTeam A goals: " << team_A_goals;
+		cout << "\nTeam B goals: " << team_B_goals << "\n\n";
+	}
+	cout << "Team A shots on goal: " << shots_on_goal_A << "\n";
+	cout << "Team B shots on goal: " << shots_on_goal_B << "\n\n";
+	cout << "Team A shots off goal: " << shots_off_goal_A << "\n";
+	cout << "Team B shots off goal: " << shots_off_goal_B << "\n\n";
+	cout << "Team A blocked shots: " << shots_blocked_A << "\n";
+	cout << "Team B blocked shots: " << shots_blocked_B << "\n\n";
+	cout << "Team A yellow cards: " << yellows_A << "\n";
+	cout << "Team B yellow cards: " << yellows_B << "\n\n";
+	cout << "Team A red cards: " << reds_A << "\n";
+	cout << "Team B red cards: " << reds_B << "\n";
+	cout << "*********************SCORE BOARD**************************\n\n";
+}
+
+//function that deals with each event
+int do_each_event (int event_type)
+{
+	//variable declaration
+	int outcome;
+	int card;
+	
+	//to output appropriate commentary based on each case
+	switch (event_type) //event_type is input from simulate_game
+	{
+		case (1): //if team A has shot the ball
+			{
+				outcome = is_target_goal(); //determine the outcome of the event
+				cout << "Team A has shot at target!\n";
+				if (outcome == 0)
+				{
+					//team A scored
+					team_A_goals += 1;
+					shots_on_goal_A += 1;
+					cout << "Team A has scored!\n";
+				}
+				else if (outcome == 1)
+				{
+					//Team A's shot was saved by the goalkeeper
+					shots_on_goal_A += 1;
+					shots_blocked_B += 1;
+					cout << "Shot was saved by the goalkeeper!\n";
+				}
+				else if (outcome == 2)
+				{
+					//team A's shot was off goal
+					shots_off_goal_A += 1;
+					cout << "The shot was made off goal!\n";
+				}
+				else if (outcome == 3)
+				{
+					//team A's shot was blocked by someone who is not the last defender
+					shots_blocked_B += 1;
+					cout << "The shot was blocked by a player who is not the last defender!\n";
+				}
+				break;
+			}
+		case (2): //if team B has shot the ball
+			{
+				outcome = is_target_goal(); //determine the outcome of the event
+				cout<<"Team B has shot at target!\n";
+				if (outcome == 0)
+				{
+					//Team B has scored
+					team_B_goals += 1;
+					shots_on_goal_B += 1;
+					cout << "Team B has scored!\n";
+				}
+				else if (outcome == 1)
+				{
+					//Team B's shot was saved by the goalkeeper
+					shots_on_goal_B += 1;
+					shots_blocked_A += 1;
+					cout << "Shot was saved by the goalkeeper!\n";
+				}	
+				else if (outcome == 2)
+				{
+					//Team B's shot was off goal
+					shots_off_goal_B += 1;
+					cout << "The shot was made off goal!\n";
+				}
+				else if (outcome == 3)
+				{
+					//Team B's shot was saved by someone who is not the last defender
+					shots_blocked_A += 1;
+					cout << "The shot was blocked by a player who is not the last defender!\n";
+				}
+				break;
+			}
+		case (3): //Team B fouled, Team A has a free kick
+			{
+				cout << "Team B has commited a foul!\n";
+				cout << "Team A is awarded a free kick!\n";
+ 				
+ 				outcome = is_target_goal(); //determine the outcome of the event
+ 				
+ 				if (outcome == 0)
+				{
+					//Team A has scored
+					team_A_goals += 1;
+					shots_on_goal_A += 1;
+					cout << "Team A has scored!\n";
+				}
+				else if (outcome == 1)
+				{
+					//Team A's shot was saved by the goalkeeper
+					shots_on_goal_A += 1;
+					shots_blocked_B += 1;
+					cout << "Shot was saved by the goalkeeper!\n";
+				}
+				else if (outcome == 2)
+				{
+					//Team A's shot was made off goal
+					shots_off_goal_A += 1;
+					cout << "The shot was made off goal!\n";
+				}
+				else if (outcome == 3)
+				{
+					//Team A's shot was blocked by someone who is not the last defender
+					shots_blocked_B += 1;
+					cout << "The shot was blocked by a player who is not the last defender!\n";
+				}
+				break;
+			}
+		case (4): //Team A fouled, Team B has free kick
+			{
+				cout << "Team A has commited a foul!\n";
+				cout << "Team B is awarded a free kick!\n";
+				
+				outcome = is_target_goal(); //determine the outcome of the game
+				
+				if (outcome == 0)
+				{
+					//Team B has scored
+					team_B_goals += 1;
+					shots_on_goal_B += 1;
+					cout << "Team B has scored!\n";
+				}
+				else if (outcome == 1)
+				{
+					//Team B's shot has been saved by the goalkeeper
+					shots_on_goal_B += 1;
+					shots_blocked_A += 1;
+					cout << "Shot was saved by the goalkeeper!\n";
+					shots_blocked_A += 1;
+				}	
+				else if (outcome == 2)
+				{
+					//Team B's shot was off the goal
+					shots_off_goal_B += 1;
+					cout << "The shot was made off goal!\n";
+				}
+				else if (outcome == 3)
+				{
+					//Team B's shot was blocked by someone who is not the last defender
+					shots_blocked_A += 1;
+					cout << "The shot was blocked by a player who is not the last defender!\n";
+				}
+				break;
+			}
+		case (5): //Team B fouled, Team A has penalty
+			{
+				cout << "Team B has commited a foul close to the goal!\n";
+				cout << "Team A is awarded a penalty kick!\n";
+				
+				outcome = is_penalty_goal(); //to determine the outcome of the game
+				
+				if (outcome == 0)
+				{
+					//Team A scored
+					team_A_goals += 1;
+					shots_on_goal_A += 1;
+					cout << "Team A has scored!\n";
+				}
+				else if (outcome == 1)
+				{
+					//Team A's shot was saved by the goalkeeper
+					shots_on_goal_A += 1;
+					shots_blocked_B += 1;
+					cout << "Shot was saved by the goalkeeper!\n";
+				}	
+				else if (outcome == 2)
+				{
+					//Team A's shot was off goal
+					shots_off_goal_A += 1;
+					cout << "Shot was made off goal!\n";
+				}
+				
+				//determine whether Team B gets a card
+				card = is_card();
+				
+				if (card == 0)
+				{
+					//no card
+					cout << "Team B is given no card!\n";
+				}
+				else if (card == 1)
+				{
+					//yellow card
+					yellows_B += 1;
+					cout << "Team B is given a yellow card!\n";
+				}	
+				else if (card == 2)
+				{
+					//red card
+					reds_B += 1;
+					cout << "Team B is given a red card!\n";
+				}
+				break;
+			}
+		case (6): //Team A fouled, Team B has a penalty
+			{
+				cout << "Team A has commited a foul close to the goal!\n";
+				cout << "Team B is awarded a penalty kick!\n";
+				
+				outcome = is_penalty_goal(); //to determine the outcome of the event
+				
+				if (outcome == 0)
+				{
+					//Team B has scored
+					team_B_goals += 1;
+					shots_on_goal_B += 1;
+					cout << "Team B has scored!\n";
+				}
+				else if (outcome == 1)
+				{
+					//Team B's shot was saved by the goalkeeper
+					shots_on_goal_B += 1;
+					shots_blocked_A += 1;
+					cout << "Shot was saved by the goalkeeper!\n";
+				}	
+				else if (outcome == 2)
+				{
+					//Team B's shot was off goal
+					shots_off_goal_B += 1;
+					cout << "Shot was made off goal!\n";
+				}
+				
+				//determine if Team A gets a card
+				card = is_card();
+				
+				if (card == 0)
+				{
+					//no card
+					cout << "Team A is given no card!\n";
+				}
+				else if (card== 1)
+				{
+					//yellow card
+					yellows_A += 1;
+					cout << "Team A is given a yellow card!\n";
+				}	
+				else if (card== 2)
+				{
+					//red card
+					reds_A += 1;
+					cout << "Team A is given a red card!\n";
+				}
+				break;
+			}			
+	}
+}
+
+//random number generators
+int is_card()
+{
+	int number;
+	number = rand() % 3;
+	return number;
+}
+int is_penalty_goal()
+{
+	int number;
+	number = rand() % 3;
+	return number;
+}
+int is_target_goal()
+{
+	int number;
+	number = rand() % 4;
+	return number;
+}
+int number_of_events()
+{
+	int number;
+	number = rand()%30+1;
+	return number;
+}
+int type_of_event()
+{
+	int number;
+	number = rand()%6+1;
+	return number;
+}
+//end
+
